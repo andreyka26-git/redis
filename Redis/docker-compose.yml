@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+  master:
+    build:
+      context: .
+      dockerfile: ./Redis.Master/Dockerfile
+    image: master:latest
+    ports:
+      - "5001:5001"
+    environment:
+        - ASPNETCORE_URLS=http://*:5001
+        - ASPNETCORE_ENVIRONMENT=Release
+    container_name: redis-master
+
+  child:
+    build:
+      context: .
+      dockerfile: ./Redis.Child/Dockerfile
+    image: child:latest
+    ports:
+      - "5002:5002"
+    environment:
+        - ASPNETCORE_URLS=http://*:5002
+        - ASPNETCORE_ENVIRONMENT=Release
+    container_name: redis-child  
