@@ -10,6 +10,7 @@ namespace Redis.Master.Controllers
     //TODO add replication (for availability)
     //TODO add rebalancing of the partitions
     //TODO add load test
+    //TODO change hash generation to platform and deploy-version independent
     [ApiController]
     public class MasterController : ControllerBase
     {
