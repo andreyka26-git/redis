@@ -35,7 +35,7 @@ namespace Redis.Master.Infrastructure
 
                 using (var response = await _httpClient.SendAsync(message, cancellationToken))
                 {
-                    if (response.IsSuccessStatusCode)
+                    if (!response.IsSuccessStatusCode)
                         throw new Exception($"StatusCode from child is not success. Status Code: {response.StatusCode}");
                 }
             }
@@ -48,8 +48,9 @@ namespace Redis.Master.Infrastructure
             {
                 using (var response = await _httpClient.SendAsync(message, cancellationToken))
                 {
-                    if (response.IsSuccessStatusCode)
+                    if (!response.IsSuccessStatusCode)
                         throw new Exception($"StatusCode from child is not success. Status Code: {response.StatusCode}");
+
                     var responseContent = await response.Content.ReadAsStringAsync();
                     return responseContent;
                 }
