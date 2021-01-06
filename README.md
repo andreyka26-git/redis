@@ -9,8 +9,6 @@ TODO:
 
 add authentication (at least some token in header)
 
-add prime factor to partition counter in order to get uniform distribution of hash
-
 add error handling
 
 add replication (for availability)
@@ -18,5 +16,3 @@ add replication (for availability)
 add rebalancing of the partitions
 
 add load test
-
-change hash generation to platform and deploy-version independent
