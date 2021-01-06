@@ -5,30 +5,35 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Redis.Child.Application;
 using Redis.Child.Exceptions;
+using Redis.Common.Abstractions;
 
 namespace Redis.Child.Infrastructure
 {
-    //TODO add prime length
     public class Partition : IPartition
     {
+        private readonly IPrimeNumberService _primeNumberService;
+
         private readonly LinkedList<Entry>[] _entries;
         private readonly int _entriesCount;
         private int _count;
 
-        public Partition(IOptions<ChildOptions> options)
+        public Partition(IPrimeNumberService primeNumberService,
+            IOptions<ChildOptions> options)
         {
-            _entriesCount = options.Value.PartitionItemsCount;
+            _primeNumberService = primeNumberService;
+            _entriesCount = _primeNumberService.GetPrime(options.Value.PartitionItemsCount);
+
             _entries = new LinkedList<Entry>[_entriesCount];
             _count = 0;
         }
 
-        public void Add<T>(string key, int hashKey, T obj)
+        public void Add<T>(string key, uint hashKey, T obj)
         {
             var jsonObj = JsonConvert.SerializeObject(obj);
             Add(key, hashKey, jsonObj);
         }
         
-        public void Add(string key, int hashKey, string obj)
+        public void Add(string key, uint hashKey, string obj)
         {
             if (_count >= _entriesCount)
                 throw new ChildOverflowException();
@@ -55,7 +60,7 @@ namespace Redis.Child.Infrastructure
             }
         }
 
-        public string Get(string key, int hashKey)
+        public string Get(string key, uint hashKey)
         {
             var hashCodeList = _entries[hashKey % _entriesCount];
 
@@ -68,7 +73,7 @@ namespace Redis.Child.Infrastructure
             throw new Exception($"Cannot find node by {key} key");
         }
 
-        public T Get<T>(string key, int hashKey)
+        public T Get<T>(string key, uint hashKey)
         {
             var hashCodeList = _entries[hashKey % _entriesCount];
 

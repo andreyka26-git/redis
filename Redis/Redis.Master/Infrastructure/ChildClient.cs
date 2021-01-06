@@ -18,7 +18,7 @@ namespace Redis.Master.Infrastructure
             _httpClient = httpClient;
         }
 
-        public async Task AddAsync(Child child, string key, int hash, string value, CancellationToken cancellationToken)
+        public async Task AddAsync(Child child, string key, uint hash, string value, CancellationToken cancellationToken)
         {
             var url = $"{child.ChildUrl}/partition";
             using (var message = new HttpRequestMessage(HttpMethod.Post, url))
@@ -41,7 +41,7 @@ namespace Redis.Master.Infrastructure
             }
         }
 
-        public async Task<string> GetAsync(Child child, string key, int hash, CancellationToken cancellationToken)
+        public async Task<string> GetAsync(Child child, string key, uint hash, CancellationToken cancellationToken)
         {
             var url = $"{child.ChildUrl}/partition?key={key}&hashKey={hash}";
             using (var message = new HttpRequestMessage(HttpMethod.Get, url))

@@ -1,12 +1,12 @@
-﻿using Redis.Common.HashGeneration;
+﻿using Redis.Common.Abstractions;
 
 namespace Redis.Tests.TestEntities
 {
     internal class HashGeneratorFake : IHashGenerator
     {
-        public int GenerateHash<T>(T obj)
+        public uint GenerateHash<T>(T obj)
         {
-            return (int)((uint)obj.GetHashCode());
+            return ((uint)obj.GetHashCode());
         }
     }
 }

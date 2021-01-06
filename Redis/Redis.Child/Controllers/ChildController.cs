@@ -15,7 +15,7 @@ namespace Redis.Child.Controllers
         }
 
         [HttpGet("partition")]
-        public ActionResult<string> Get([FromQuery] string key, [FromQuery] int hashKey)
+        public ActionResult<string> Get([FromQuery] string key, [FromQuery] uint hashKey)
         {
             var val = _partition.Get(key, hashKey);
             return Ok(val);

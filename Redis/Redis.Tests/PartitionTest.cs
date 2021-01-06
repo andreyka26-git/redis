@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Redis.Child;
 using Redis.Child.Infrastructure;
+using Redis.Tests.TestEntities;
 
 namespace Redis.Tests
 {
@@ -18,7 +19,9 @@ namespace Redis.Tests
             var optionsMock = new Mock<IOptions<ChildOptions>>();
             optionsMock.Setup((o) => o.Value).Returns(() => new ChildOptions { PartitionItemsCount = 20000 });
 
-            _partition = new Partition(optionsMock.Object);
+            var primeNumberService = new PrimeNumberServiceFake();
+
+            _partition = new Partition(primeNumberService, optionsMock.Object);
         }
 
         [TestMethod]
@@ -29,7 +32,7 @@ namespace Redis.Tests
                 var c = 0;
                 while (c < 10000)
                 {
-                    _partition.Add(c.ToString(), c.GetHashCode(), c);
+                    _partition.Add(c.ToString(), (uint)c.GetHashCode(), c);
                     c++;
                 }
             });
@@ -39,14 +42,14 @@ namespace Redis.Tests
                 var c = 10001;
                 while (c < 20000)
                 {
-                    _partition.Add(c.ToString(), c.GetHashCode(), c);
+                    _partition.Add(c.ToString(), (uint)c.GetHashCode(), c);
                     c++;
                 }
             });
 
             await Task.WhenAll(firstTask, secondTask);
 
-            var val = _partition.Get<int>(1.ToString(), 1.GetHashCode());
+            var val = _partition.Get<int>(1.ToString(), (uint)1.GetHashCode());
 
             Assert.AreEqual(val, 1);
         }
@@ -57,11 +60,11 @@ namespace Redis.Tests
             var integer = 6357089;
             var charWithSameHash = 'a';
 
-            _partition.Add(integer.ToString(), integer.GetHashCode(), integer);
-            _partition.Add(charWithSameHash.ToString(), charWithSameHash.GetHashCode(), charWithSameHash);
+            _partition.Add(integer.ToString(), (uint)integer.GetHashCode(), integer);
+            _partition.Add(charWithSameHash.ToString(), (uint)charWithSameHash.GetHashCode(), charWithSameHash);
 
-            var intVal = _partition.Get<int>(integer.ToString(), integer.GetHashCode());
-            var charVal = _partition.Get<char>(charWithSameHash.ToString(), charWithSameHash.GetHashCode());
+            var intVal = _partition.Get<int>(integer.ToString(), (uint)integer.GetHashCode());
+            var charVal = _partition.Get<char>(charWithSameHash.ToString(), (uint)charWithSameHash.GetHashCode());
 
             Assert.AreEqual(intVal, integer);
             Assert.AreEqual(charVal, charWithSameHash);

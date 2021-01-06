@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Redis.Common.HashGeneration;
+using Redis.Common.Abstractions;
+using Redis.Common.Implementations;
 using Redis.Master.Application;
 using Redis.Master.Infrastructure;
 
@@ -24,8 +25,12 @@ namespace Redis.Master
             services.AddSwaggerGen();
             services.AddControllers();
 
-            services.AddSingleton<IHashGenerator, HashGenerator>();
+            services.AddSingleton<IHashGenerator, JenkinsHashGenerator>();
+            services.AddSingleton<IBinarySerializer, BsonSerializer>();
+            services.AddSingleton<IBitHelper, BitHelper>();
+            services.AddSingleton<IPrimeNumberService, PrimeNumberService>();
             services.AddSingleton<IMasterService, MasterService>();
+            services.AddHttpClient<IChildClient, ChildClient>();
             services.AddHttpClient<IChildClient, ChildClient>();
             services.Configure<MasterOptions>(Configuration.GetSection(nameof(MasterOptions)));
         }

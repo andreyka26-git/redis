@@ -6,11 +6,9 @@ using Redis.Master.Application;
 namespace Redis.Master.Controllers
 {
     //TODO add authentication (at least some token in header)
-    //TODO add prime factor to partition counter in order to get uniform distribution of hash
     //TODO add replication (for availability)
     //TODO add rebalancing of the partitions
     //TODO add load test
-    //TODO change hash generation to platform and deploy-version independent
     [ApiController]
     public class MasterController : ControllerBase
     {

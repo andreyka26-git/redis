@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Redis.Common.HashGeneration;
+using Redis.Common.Abstractions;
 using Redis.Master;
 using Redis.Master.Application;
 using Redis.Master.Infrastructure;
@@ -26,7 +26,7 @@ namespace Redis.Tests
                 .Setup(c => c.AddAsync(
                     It.IsAny<Master.Application.Child>(),
                     It.IsAny<string>(),
-                    It.IsAny<int>(),
+                    It.IsAny<uint>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()));
 
@@ -34,7 +34,7 @@ namespace Redis.Tests
                 .Setup(c => c.GetAsync(
                     It.IsAny<Master.Application.Child>(),
                     It.IsAny<string>(),
-                    It.IsAny<int>(),
+                    It.IsAny<uint>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => "someValue");
 
@@ -46,7 +46,9 @@ namespace Redis.Tests
                 PartitionItemsCount = 30
             });
 
-            _master = new MasterService(hashGeneratorFake, clientMock.Object, optionsMock.Object);
+            var primeNumberService = new PrimeNumberServiceFake();
+
+            _master = new MasterService(hashGeneratorFake, clientMock.Object, primeNumberService, optionsMock.Object);
         }
 
         [TestMethod]

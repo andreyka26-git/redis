@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Redis.Common.HashGeneration;
+using Redis.Common.Abstractions;
 using Redis.Master.Application;
 
 [assembly: InternalsVisibleTo("Redis.Tests")]
@@ -14,6 +14,7 @@ namespace Redis.Master.Infrastructure
     {
         private readonly IHashGenerator _hashGenerator;
         private readonly IChildClient _client;
+        private readonly IPrimeNumberService _primeNumberService;
         private readonly MasterOptions _options;
         
         private readonly int _overallCount;
@@ -21,13 +22,16 @@ namespace Redis.Master.Infrastructure
 
         public MasterService(IHashGenerator hashGenerator,
             IChildClient client,
+            IPrimeNumberService primeNumberService,
             IOptions<MasterOptions> options)
         {
             _options = options.Value;
             _hashGenerator = hashGenerator;
             _client = client;
 
-            _overallCount = _options.PartitionItemsCount * _options.Children.Count;
+            var partitionItemsCount = primeNumberService.GetPrime(_options.PartitionItemsCount);
+
+            _overallCount = partitionItemsCount * _options.Children.Count;
             _children = InitializeChildren(_options.Children, _options.PartitionItemsCount);
         }
 
@@ -48,7 +52,7 @@ namespace Redis.Master.Infrastructure
             return value;
         }
 
-        internal Child DetermineChildByHash(List<Child> children, string key, int hash, int overallCount)
+        internal Child DetermineChildByHash(List<Child> children, string key, uint hash, int overallCount)
         {
             //TODO think about not O(n) solution for that, use binary search at least to get O(log n)
             var hashMod = hash % overallCount;

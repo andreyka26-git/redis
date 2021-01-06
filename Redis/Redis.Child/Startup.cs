@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Redis.Child.Application;
 using Redis.Child.Infrastructure;
+using Redis.Common.Abstractions;
+using Redis.Common.Implementations;
 
 namespace Redis.Child
 {
@@ -24,6 +26,7 @@ namespace Redis.Child
 
             services.AddControllers();
             services.AddSingleton<IPartition, Partition>();
+            services.AddSingleton<IPrimeNumberService, PrimeNumberService>();
             services.Configure<ChildOptions>(Configuration.GetSection(nameof(ChildOptions)));
         }
 
