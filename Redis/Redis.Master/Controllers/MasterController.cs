@@ -1,6 +1,8 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Redis.Common.Dto;
 using Redis.Master.Application;
 
 namespace Redis.Master.Controllers
@@ -17,6 +19,14 @@ namespace Redis.Master.Controllers
         public MasterController(IMasterService masterService)
         {
             _masterService = masterService;
+        }
+
+        //for monitoring purposes
+        [HttpGet("master/partitions")]
+        public async Task<ActionResult<List<ChildEntriesDto>>> GetAllPartitionsAsync(CancellationToken cancellationToken)
+        {
+            var entries = await _masterService.GetAllEntriesAsync(cancellationToken);
+            return Ok(entries);
         }
 
         [HttpGet("master")]

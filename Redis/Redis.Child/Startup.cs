@@ -27,7 +27,7 @@ namespace Redis.Child
             services.AddControllers();
             services.AddSingleton<IPartition, Partition>();
             services.AddSingleton<IPrimeNumberService, PrimeNumberService>();
-            services.Configure<ChildOptions>(Configuration.GetSection(nameof(ChildOptions)));
+            //services.Configure<ChildOptions>(Configuration.GetSection(nameof(ChildOptions)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

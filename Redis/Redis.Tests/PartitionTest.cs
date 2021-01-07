@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -16,8 +17,8 @@ namespace Redis.Tests
         [TestInitialize]
         public void Init()
         {
-            var optionsMock = new Mock<IOptions<ChildOptions>>();
-            optionsMock.Setup((o) => o.Value).Returns(() => new ChildOptions { PartitionItemsCount = 20000 });
+            var optionsMock = new Mock<IConfiguration>();
+            optionsMock.Setup((o) => o[It.IsAny<string>()]).Returns(() => "107");
 
             var primeNumberService = new PrimeNumberServiceFake();
 

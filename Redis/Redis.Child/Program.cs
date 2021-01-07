@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Redis.Common.Infrastructure;
 
 namespace Redis.Child
 {
@@ -7,14 +7,9 @@ namespace Redis.Child
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            WebHost.CreateWebHostBuilder<Startup>()
+                .Build()
+                .Run();
         }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
     }
 }

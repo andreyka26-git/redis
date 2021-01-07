@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Redis.Child.Application;
 using Redis.Child.Exceptions;
+using Redis.Common;
 using Redis.Common.Abstractions;
 
 namespace Redis.Child.Infrastructure
@@ -18,13 +20,25 @@ namespace Redis.Child.Infrastructure
         private int _count;
 
         public Partition(IPrimeNumberService primeNumberService,
-            IOptions<ChildOptions> options)
+            IConfiguration config)
         {
             _primeNumberService = primeNumberService;
-            _entriesCount = _primeNumberService.GetPrime(options.Value.PartitionItemsCount);
+            var partitionItemsCount = config.GetValue<int>(GlobalConsts.PartitionItemsCountName);
+
+            _entriesCount = _primeNumberService.GetPrime(partitionItemsCount);
 
             _entries = new LinkedList<Entry>[_entriesCount];
             _count = 0;
+        }
+
+        public List<(uint hashKey, LinkedList<Entry> entries)> GetEntries()
+        {
+            var entries = _entries
+                .Where(l => l != null)
+                .Select(l => (l.First().HashCode % (uint)_entriesCount, l))
+                .ToList();
+
+            return entries;
         }
 
         public void Add<T>(string key, uint hashKey, T obj)
@@ -43,9 +57,7 @@ namespace Redis.Child.Infrastructure
             {
                 var newLinkedList = new LinkedList<Entry>();
 
-                while(Interlocked.CompareExchange(ref _entries[hashKey % _entriesCount], newLinkedList, null) == null)
-                {
-                }
+                Interlocked.CompareExchange(ref _entries[hashKey % _entriesCount], newLinkedList, null);
             }
 
             lock (_entries[hashKey % _entriesCount])
@@ -55,7 +67,7 @@ namespace Redis.Child.Infrastructure
                     if (entry.Key == key)
                         throw new Exception("Object with the same value has already existed");
                 }
-                _entries[hashKey % _entriesCount].AddLast(new Entry(key, obj));
+                _entries[hashKey % _entriesCount].AddLast(new Entry(hashKey, key, obj));
                 _count++;
             }
         }
@@ -63,6 +75,9 @@ namespace Redis.Child.Infrastructure
         public string Get(string key, uint hashKey)
         {
             var hashCodeList = _entries[hashKey % _entriesCount];
+
+            if (hashCodeList == null)
+                return string.Empty;
 
             foreach (var entry in hashCodeList)
             {

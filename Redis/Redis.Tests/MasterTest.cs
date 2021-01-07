@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -42,13 +43,15 @@ namespace Redis.Tests
 
             optionsMock.Setup(o => o.Value).Returns(() => new MasterOptions
             {
-                Children = new List<string> {"url1", "url2", "url3"},
-                PartitionItemsCount = 30
+                Children = new List<string> {"url1", "url2", "url3"}
             });
+
+            var config = new Mock<IConfiguration>();
+            config.Setup(c => c[It.IsAny<string>()]).Returns(() => "107");
 
             var primeNumberService = new PrimeNumberServiceFake();
 
-            _master = new MasterService(hashGeneratorFake, clientMock.Object, primeNumberService, optionsMock.Object);
+            _master = new MasterService(hashGeneratorFake, clientMock.Object, primeNumberService, config.Object, optionsMock.Object);
         }
 
         [TestMethod]

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Redis.Common;
 using Redis.Common.Abstractions;
 using Redis.Common.Implementations;
 using Redis.Master.Application;
@@ -26,7 +27,7 @@ namespace Redis.Master
             services.AddControllers();
 
             services.AddSingleton<IHashGenerator, JenkinsHashGenerator>();
-            services.AddSingleton<IBinarySerializer, BsonSerializer>();
+            services.AddSingleton<IBinarySerializer, JsonSerializer>();
             services.AddSingleton<IBitHelper, BitHelper>();
             services.AddSingleton<IPrimeNumberService, PrimeNumberService>();
             services.AddSingleton<IMasterService, MasterService>();

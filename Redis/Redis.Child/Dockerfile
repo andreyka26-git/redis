@@ -10,6 +10,7 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
 COPY ["Redis.Child/Redis.Child.csproj", "Redis.Child/"]
+COPY ["Redis.Common/Redis.Common.csproj", "Redis.Common/"]
 RUN dotnet restore "Redis.Child/Redis.Child.csproj"
 COPY . .
 WORKDIR "/src/Redis.Child"

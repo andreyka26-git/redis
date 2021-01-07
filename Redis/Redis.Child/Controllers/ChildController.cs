@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Redis.Child.Application;
 using Redis.Common.Dto;
 
@@ -12,6 +14,17 @@ namespace Redis.Child.Controllers
         public ChildController(IPartition partition)
         {
             _partition = partition;
+        }
+
+        [HttpGet("partition/entries")]
+        public IActionResult GetEntries()
+        {
+            var entries = _partition
+                .GetEntries()
+                .Select(b =>
+                    new BucketDto(b.hashKey, b.entries.Select(e => new EntryDto(e.HashCode, e.Key, e.Value))));
+
+            return Ok(entries);
         }
 
         [HttpGet("partition")]

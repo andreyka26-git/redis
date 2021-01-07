@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -18,17 +19,28 @@ namespace Redis.Master.Infrastructure
             _httpClient = httpClient;
         }
 
+        public async Task<List<BucketDto>> GetAllEntriesAsync(Child child, CancellationToken cancellationToken)
+        {
+            var url = $"{child.ChildUrl}/partition/entries";
+
+            using (var message = new HttpRequestMessage(HttpMethod.Get, url))
+            using (var response = await _httpClient.SendAsync(message, cancellationToken))
+            {
+                if (!response.IsSuccessStatusCode)
+                    throw new Exception($"StatusCode from child is not success. Status Code: {response.StatusCode}");
+
+                var bucketsJson = await response.Content.ReadAsStringAsync();
+                var buckets = JsonConvert.DeserializeObject<List<BucketDto>>(bucketsJson);
+                return buckets;
+            }
+        }
+
         public async Task AddAsync(Child child, string key, uint hash, string value, CancellationToken cancellationToken)
         {
             var url = $"{child.ChildUrl}/partition";
             using (var message = new HttpRequestMessage(HttpMethod.Post, url))
             {
-                var entry = new EntryDto
-                {
-                    HashKey = hash,
-                    Key = key,
-                    Value = value
-                };
+                var entry = new EntryDto(hash, key, value);
 
                 var entryDto = JsonConvert.SerializeObject(entry);
                 message.Content = new StringContent(entryDto, Encoding.UTF8, "application/json");

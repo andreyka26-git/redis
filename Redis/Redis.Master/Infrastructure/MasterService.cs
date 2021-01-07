@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Redis.Common;
 using Redis.Common.Abstractions;
+using Redis.Common.Dto;
 using Redis.Master.Application;
 
 [assembly: InternalsVisibleTo("Redis.Tests")]
@@ -23,16 +26,17 @@ namespace Redis.Master.Infrastructure
         public MasterService(IHashGenerator hashGenerator,
             IChildClient client,
             IPrimeNumberService primeNumberService,
+            IConfiguration config,
             IOptions<MasterOptions> options)
         {
             _options = options.Value;
             _hashGenerator = hashGenerator;
             _client = client;
 
-            var partitionItemsCount = primeNumberService.GetPrime(_options.PartitionItemsCount);
+            var partitionItemsCount =  primeNumberService.GetPrime(config.GetValue<int>(GlobalConsts.PartitionItemsCountName));
 
             _overallCount = partitionItemsCount * _options.Children.Count;
-            _children = InitializeChildren(_options.Children, _options.PartitionItemsCount);
+            _children = InitializeChildren(_options.Children, partitionItemsCount);
         }
 
         public async Task AddAsync(string key, string value, CancellationToken cancellationToken)
@@ -41,6 +45,24 @@ namespace Redis.Master.Infrastructure
             var child = DetermineChildByHash(_children, key, hash, _overallCount);
 
             await _client.AddAsync(child, key, hash, value, cancellationToken);
+        }
+
+        public async Task<List<ChildEntriesDto>> GetAllEntriesAsync(CancellationToken cancellationToken)
+        {
+            var resp = new List<ChildEntriesDto>();
+
+            var tasks = new List<(string url, Task<List<BucketDto>> bucketsTask)>();
+
+            foreach (var child in _children)
+                tasks.Add((child.ChildUrl, Task.Run(() => _client.GetAllEntriesAsync(child, cancellationToken), cancellationToken)));
+
+            foreach (var task in tasks)
+            {
+                var buckets = await task.bucketsTask;
+                resp.Add(new ChildEntriesDto(task.url, buckets));
+            }
+
+            return resp;
         }
 
         public async Task<string> GetAsync(string key, CancellationToken cancellationToken)
