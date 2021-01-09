@@ -7,6 +7,7 @@ using Redis.Common.Dto;
 namespace Redis.Child.Controllers
 {
     [ApiController]
+    [Route("partition")]
     public class ChildController : ControllerBase
     {
         private readonly IPartition _partition;
@@ -16,7 +17,7 @@ namespace Redis.Child.Controllers
             _partition = partition;
         }
 
-        [HttpGet("partition/entries")]
+        [HttpGet("entries")]
         public IActionResult GetEntries()
         {
             var entries = _partition
@@ -27,14 +28,14 @@ namespace Redis.Child.Controllers
             return Ok(entries);
         }
 
-        [HttpGet("partition")]
+        [HttpGet]
         public ActionResult<string> Get([FromQuery] string key, [FromQuery] uint hashKey)
         {
             var val = _partition.Get(key, hashKey);
             return Ok(val);
         }
 
-        [HttpPost("partition")]
+        [HttpPost]
         public IActionResult Add([FromBody] EntryDto entry)
         {
             _partition.Add(entry.Key, entry.HashKey, entry.Value);

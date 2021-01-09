@@ -32,7 +32,8 @@ namespace Redis.Master
             services.AddSingleton<IPrimeNumberService, PrimeNumberService>();
             services.AddSingleton<IMasterService, MasterService>();
             services.AddHttpClient<IChildClient, ChildClient>();
-            services.AddHttpClient<IChildClient, ChildClient>();
+            services.AddHttpClient<IMasterClient, MasterClient>();
+            services.AddSingleton<IReplicationService, ReplicationService>();
             services.Configure<MasterOptions>(Configuration.GetSection(nameof(MasterOptions)));
         }
 

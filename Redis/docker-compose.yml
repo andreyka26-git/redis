@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  master:
+  master1:
     build:
       context: .
       dockerfile: ./Redis.Master/Dockerfile
@@ -11,11 +11,13 @@ services:
     environment:
         - ASPNETCORE_URLS=http://*:80
         - ASPNETCORE_ENVIRONMENT=Release
-        - MasterOptions__Children__0=http://child1:80
-        - MasterOptions__Children__1=http://child2:80
-    container_name: redis-master
+        - MasterOptions__Children__0=http://child11:80
+        - MasterOptions__Children__1=http://child12:80
+        - MasterOptions__ReplicationActor=Master
+        - MasterOptions__Slaves__0=http://master2:80
+    container_name: redis-master1
 
-  child1:
+  child11:
     build:
       context: .
       dockerfile: ./Redis.Child/Dockerfile
@@ -25,9 +27,9 @@ services:
     environment:
         - ASPNETCORE_URLS=http://*:80
         - ASPNETCORE_ENVIRONMENT=Release
-    container_name: redis-child1
+    container_name: redis-child11
 
-  child2:
+  child12:
     build:
       context: .
       dockerfile: ./Redis.Child/Dockerfile
@@ -37,4 +39,43 @@ services:
     environment:
         - ASPNETCORE_URLS=http://*:80
         - ASPNETCORE_ENVIRONMENT=Release
-    container_name: redis-child2
+    container_name: redis-child12
+
+  master2:
+    build:
+      context: .
+      dockerfile: ./Redis.Master/Dockerfile
+    image: master:latest
+    ports:
+      - "6001:80"
+    environment:
+        - ASPNETCORE_URLS=http://*:80
+        - ASPNETCORE_ENVIRONMENT=Release
+        - MasterOptions__Children__0=http://child11:80
+        - MasterOptions__Children__1=http://child12:80
+        - MasterOptions__ReplicationActor=Slave
+    container_name: redis-master2
+
+  child21:
+    build:
+      context: .
+      dockerfile: ./Redis.Child/Dockerfile
+    image: child:latest
+    ports:
+      - "6002:80"
+    environment:
+        - ASPNETCORE_URLS=http://*:80
+        - ASPNETCORE_ENVIRONMENT=Release
+    container_name: redis-child21
+
+  child22:
+    build:
+      context: .
+      dockerfile: ./Redis.Child/Dockerfile
+    image: child:latest
+    ports:
+      - "6003:80"
+    environment:
+        - ASPNETCORE_URLS=http://*:80
+        - ASPNETCORE_ENVIRONMENT=Release
+    container_name: redis-child22
