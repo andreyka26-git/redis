@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Redis.Common.Abstractions;
 using Redis.Common.Dto;
 using Redis.Master.Application;
@@ -52,7 +53,8 @@ namespace Redis.Master.Controllers
             await _masterService.AddAsync(key, value, cancellationToken);
 
             //we don't await because we're using asynchronous type of replication because of performance considerations.
-            _replicationService.ReplicateToSlavesAsync(key, value, cancellationToken);
+            var replicationValue = JsonConvert.SerializeObject(value);
+            _replicationService.ReplicateToSlavesAsync(key, replicationValue, cancellationToken);
 
             return Ok();
         }

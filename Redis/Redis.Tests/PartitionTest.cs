@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -5,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Redis.Child;
 using Redis.Child.Infrastructure;
+using Redis.Common;
 using Redis.Tests.TestEntities;
 
 namespace Redis.Tests
@@ -17,12 +19,17 @@ namespace Redis.Tests
         [TestInitialize]
         public void Init()
         {
-            var optionsMock = new Mock<IConfiguration>();
-            optionsMock.Setup((o) => o[It.IsAny<string>()]).Returns(() => "107");
+            var inMemorySettings = new Dictionary<string, string> {
+                { GlobalConsts.PartitionItemsCountName, "25229" }
+            };
+
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
 
             var primeNumberService = new PrimeNumberServiceFake();
 
-            _partition = new Partition(primeNumberService, optionsMock.Object);
+            _partition = new Partition(primeNumberService, configuration);
         }
 
         [TestMethod]

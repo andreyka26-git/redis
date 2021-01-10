@@ -51,8 +51,8 @@ services:
     environment:
         - ASPNETCORE_URLS=http://*:80
         - ASPNETCORE_ENVIRONMENT=Release
-        - MasterOptions__Children__0=http://child11:80
-        - MasterOptions__Children__1=http://child12:80
+        - MasterOptions__Children__0=http://child21:80
+        - MasterOptions__Children__1=http://child22:80
         - MasterOptions__ReplicationActor=Slave
     container_name: redis-master2
 

@@ -27,7 +27,7 @@ namespace Redis.Master.Infrastructure
         {
             try
             {
-                var url = $"{slaveUrl}/key={key}";
+                var url = $"{slaveUrl}/master/replication?key={key}";
 
                 using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, url))
                 {
@@ -36,7 +36,8 @@ namespace Redis.Master.Infrastructure
 
                     using (var response = await _httpClient.SendAsync(requestMessage, cancellationToken))
                     {
-                        response.EnsureSuccessStatusCode();
+                        if (!response.IsSuccessStatusCode)
+                            throw new Exception($"Cannot replicate, got status code: {response.StatusCode}. Body: {await response.Content.ReadAsStringAsync()}");
                     }
                 }
             }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Redis.Common;
 using Redis.Common.Abstractions;
 using Redis.Master;
 using Redis.Master.Application;
@@ -46,12 +47,17 @@ namespace Redis.Tests
                 Children = new List<string> {"url1", "url2", "url3"}
             });
 
-            var config = new Mock<IConfiguration>();
-            config.Setup(c => c[It.IsAny<string>()]).Returns(() => "107");
+            var inMemorySettings = new Dictionary<string, string> {
+                { GlobalConsts.PartitionItemsCountName, "107" }
+            };
+
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
 
             var primeNumberService = new PrimeNumberServiceFake();
 
-            _master = new MasterService(hashGeneratorFake, clientMock.Object, primeNumberService, config.Object, optionsMock.Object);
+            _master = new MasterService(hashGeneratorFake, clientMock.Object, primeNumberService, configuration, optionsMock.Object);
         }
 
         [TestMethod]
