@@ -11,6 +11,6 @@ add error handling
 
 add rebalancing of the partitions
 
-add integration and  load test
+add load test
 
 add remove method
