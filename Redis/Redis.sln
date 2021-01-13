@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redis.Child", "Redis.Child\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redis.Common", "Redis.Common\Redis.Common.csproj", "{4123EA2E-B790-44C6-9A20-73A75BF30801}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redis.Tests", "Redis.Tests\Redis.Tests.csproj", "{B3C36034-9D1F-40F4-9F27-0D9D72AA72EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redis.Tests", "Redis.Tests\Redis.Tests.csproj", "{B3C36034-9D1F-40F4-9F27-0D9D72AA72EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redis.IntegrationTests", "Redis.IntegrationTests\Redis.IntegrationTests.csproj", "{42EA9F4C-89C2-4D9F-89FF-BA57E65F8260}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{B3C36034-9D1F-40F4-9F27-0D9D72AA72EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3C36034-9D1F-40F4-9F27-0D9D72AA72EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3C36034-9D1F-40F4-9F27-0D9D72AA72EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42EA9F4C-89C2-4D9F-89FF-BA57E65F8260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42EA9F4C-89C2-4D9F-89FF-BA57E65F8260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42EA9F4C-89C2-4D9F-89FF-BA57E65F8260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42EA9F4C-89C2-4D9F-89FF-BA57E65F8260}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,22 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*",
+  "PartitionItemsCount": 107,
+
+  "MasterOptions": {
+    "ReplicationActor": "Slave", //  can be Slave
+    "Slaves": [
+      ""
+    ],
+    "Children": [
+      "",
+      ""
+    ]
+  }
+}
