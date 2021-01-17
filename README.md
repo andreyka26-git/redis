@@ -1,16 +1,16 @@
 # redis
 
-It's a simple, light-weight and basic implementation of distributed cache like Redis.
-Currently it allows only deploy-time partitioning, so functionality is poor.
+It's a simple, light-weight and basic implementation of distributed cache like Redis with replication and partitioning.
 
 You can run by docker-compose or manually using .net core CLI. Both master and child allow swagger endpoing
 
-TODO:
+To run application go to root directory and use
+```
+docker-compose up
+```
 
-add error handling
+To run functional tests go to root directory and use
 
-add rebalancing of the partitions
-
-add load test
-
-add remove method
+```
+docker-compose -f docker-compose-test.yml up -d
+```
