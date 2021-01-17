@@ -1,0 +1,95 @@
+version: "3.7"
+
+services:
+  functional-test:
+    build:
+      context: .
+      dockerfile: ./Redis.FunctionalTests/Dockerfile
+      args:
+        FIRST_REPLICATION_URL: http://redis-master1-test:80
+        SECOND_REPLICATION_URL: http://redis-master1-test:80
+    image: functional-test:latest
+    environment:
+        - ASPNETCORE_ENVIRONMENT=Release
+        - FIRST_REPLICATION_URL=http://master1-test:80
+        - SECOND_REPLICATION_URL=http://master2-test:80
+    container_name: functional-test
+
+  master1-test:
+    build:
+      context: .
+      dockerfile: ./Redis.Master/Dockerfile
+    image: master:latest
+    ports:
+      - "7001:80"
+    environment:
+        - ASPNETCORE_URLS=http://*:80
+        - ASPNETCORE_ENVIRONMENT=Release
+        - MasterOptions__Children__0=http://child11-test:80
+        - MasterOptions__Children__1=http://child12-test:80
+        - MasterOptions__ReplicationActor=Master
+        - MasterOptions__Slaves__0=http://master2-test:80
+    container_name: redis-master1-test
+
+  child11-test:
+    build:
+      context: .
+      dockerfile: ./Redis.Child/Dockerfile
+    image: child:latest
+    ports:
+      - "7002:80"
+    environment:
+        - ASPNETCORE_URLS=http://*:80
+        - ASPNETCORE_ENVIRONMENT=Release
+    container_name: redis-child11-test
+
+  child12-test:
+    build:
+      context: .
+      dockerfile: ./Redis.Child/Dockerfile
+    image: child:latest
+    ports:
+      - "7003:80"
+    environment:
+        - ASPNETCORE_URLS=http://*:80
+        - ASPNETCORE_ENVIRONMENT=Release
+    container_name: redis-child12-test
+
+  master2-test:
+    build:
+      context: .
+      dockerfile: ./Redis.Master/Dockerfile
+    image: master:latest
+    ports:
+      - "8001:80"
+    environment:
+        - ASPNETCORE_URLS=http://*:80
+        - ASPNETCORE_ENVIRONMENT=Release
+        - MasterOptions__Children__0=http://child21-test:80
+        - MasterOptions__Children__1=http://child22-test:80
+        - MasterOptions__ReplicationActor=Slave
+    container_name: redis-master2-test
+
+  child21-test:
+    build:
+      context: .
+      dockerfile: ./Redis.Child/Dockerfile
+    image: child:latest
+    ports:
+      - "8002:80"
+    environment:
+        - ASPNETCORE_URLS=http://*:80
+        - ASPNETCORE_ENVIRONMENT=Release
+    container_name: redis-child21-test
+
+  child22-test:
+    build:
+      context: .
+      dockerfile: ./Redis.Child/Dockerfile
+    image: child:latest
+    ports:
+      - "8003:80"
+    environment:
+        - ASPNETCORE_URLS=http://*:80
+        - ASPNETCORE_ENVIRONMENT=Release
+    container_name: redis-child22-test
