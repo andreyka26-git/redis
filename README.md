@@ -14,3 +14,8 @@ To run functional tests go to root directory and use
 ```
 docker-compose -f docker-compose-test.yml up -d
 ```
+In order to check test results from functional tests you can use 
+```
+docker logs
+```
+for functional-test container.
